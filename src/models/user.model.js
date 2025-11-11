@@ -27,10 +27,18 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    cart: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Carts'
+    },
     role: {
         type: String,
         enum: ['user', 'admin'],
         default: 'user'
+    },
+    last_connection: {
+        type: Date,
+        default: Date.now
     }},
     {
         timestamps: true
