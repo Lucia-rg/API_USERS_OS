@@ -1,24 +1,28 @@
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const JwtStrategy = require('passport-jwt').Strategy;
-const ExtractJwt = require('passport-jwt').ExtractJwt;
-const User = require('../models/user.model');
-const { isValidPassword } = require('../utils/auth.utils');
-const { extractToken } = require('../utils/jwt.utils') ;
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import User from '../models/user.model.js';
+import { isValidPassword } from '../utils/auth.utils.js';
+import { extractToken } from '../utils/jwt.utils.js';
 
 // Local
 
-passport.use('login', new LocalStrategy({
+passport.use('local', new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password',
 }, async (email, password, done) => {
     try {
         const user = await User.findOne({email});
         if (!user) {
-        return done(null, false, { message: 'Usuario no encontrado' }); 
+            return done(null, false, { message: 'Usuario no encontrado' }); 
         }
 
-        if (!isValidPassword({password, hashedPassword: user.password})) {
+        const isPasswordValid = isValidPassword({ 
+            password, 
+            hashedPassword: user.password 
+        });
+      
+        if (!isPasswordValid) {
             return done(null, false, { message: 'Contraseña incorrecta' });
         }
 
@@ -35,7 +39,7 @@ passport.use('login', new LocalStrategy({
 // JWT (autenticación de token)
 const jwtOptions = {
     jwtFromRequest: extractToken,
-    secretOrKey: process.env.JWT_SECRET,
+    secretOrKey: process.env.JWT_SECRET || 'fallback-secret-key-for-development',
     passReqToCallback: true
 };
 
@@ -84,4 +88,4 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
-module.exports = passport;
+export default passport;

@@ -1,5 +1,5 @@
-const sessionsService = require('../services/sessions.service');
-const { generateToken, setTokenCookie, clearTokenCookie } = require('../utils/jwt.utils');
+import sessionsService from '../services/sessions.service.js';
+import { generateToken, setTokenCookie, clearTokenCookie } from '../utils/jwt.utils.js';
 
 class SessionsController {
 
@@ -168,4 +168,4 @@ class SessionsController {
     }
 }
 
-module.exports = new SessionsController();
+export default new SessionsController();

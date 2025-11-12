@@ -18,6 +18,12 @@
 
         </form>
 
+        {{#if error}}
+            <div class="alert alert-danger mt-3">
+                {{error}}
+            </div>
+        {{/if}}
+
         <p class="text-center mt-3">
             ¿Aún no tienes una cuenta? <a href="/register">Regístrate aquí</a>
         </p>

@@ -1,24 +1,38 @@
-const express = require('express');
-const handlebars = require('express-handlebars');
-const mongoose = require('mongoose');
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
-const path = require('path');
+import express from 'express';
+import handlebars from 'express-handlebars';
+import mongoose from 'mongoose';
+import cookieParser from 'cookie-parser';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+import databaseConfig from './config/database.config.js';
+import './models/user.model.js';
+import viewsRouter from './routes/views.router.js';
+import sessionsRouter from './routes/sessions.router.js';
+import passport from './config/passport.config.js';
+
 
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middlewares
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 
 app.use(express.static(path.join(__dirname, '../public')));
+app.use(cookieParser());
 
 // Configuración Handlebars
-app.engine("handlebars", handlebars.engine());
+app.engine("handlebars", handlebars.engine({
+  runtimeOptions: {
+    allowProtoPropertiesByDefault: true,
+    allowProtoMethodsByDefault: true
+  }
+}));
 app.set("view engine", "handlebars");
 app.set("views", path.join(__dirname, "views"));
 
 // Conexión MongoDB
-const databaseConfig = require("./config/database.config");
 mongoose.connect(databaseConfig.MONGODB_URI, {
     ...databaseConfig.mongooseOptions,
     dbName: databaseConfig.DB_NAME
@@ -31,24 +45,10 @@ mongoose.connect(databaseConfig.MONGODB_URI, {
     process.exit(1);
 });
 
-// Configuración de sesiones
-app.use(session({
-  secret: 'secret-key',
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: databaseConfig.MONGODB_URI,
-    ttl: 14 * 24 * 60 * 60
-  }),
-  cookie: {
-    maxAge: 14 * 24 * 60 * 60 * 1000
-  }
-}));
+// Inicializar Passport
+app.use(passport.initialize());
 
 // Routers
-const viewsRouter = require('./routes/views.router');
-const sessionsRouter = require('./routes/sessions.router');
-
 app.use('/', viewsRouter);
 app.use('/api/sessions', sessionsRouter);
 
@@ -57,7 +57,7 @@ app.get('/', (req, res) => {
 });
 
 // Servidor
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en: http://localhost:${PORT}`);
 });

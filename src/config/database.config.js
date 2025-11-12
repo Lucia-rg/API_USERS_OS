@@ -1,4 +1,4 @@
-require('dotenv').config();
+import 'dotenv/config';
 
 const databaseConfig = {
     MONGODB_URI: process.env.MONGODB_URI,
@@ -15,4 +15,4 @@ if (!databaseConfig.MONGODB_URI) {
     process.exit(1);
 }
 
-module.exports = databaseConfig;
+export default databaseConfig;

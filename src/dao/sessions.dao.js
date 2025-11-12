@@ -1,4 +1,4 @@
-const User = require('../models/user.model');
+import User from '../models/user.model.js';
 
 class SessionsDAO {
 
@@ -104,4 +104,4 @@ class SessionsDAO {
 
 }
 
-module.exports = new SessionsDAO();
+export default new SessionsDAO();

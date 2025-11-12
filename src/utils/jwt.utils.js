@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
-const jwt_secret = process.env.JWT_SECRET;
+const jwt_secret = process.env.JWT_SECRET || 'fallback-secret-key-for-development';
 
 export const generateToken = (user) => {
     const payload = {

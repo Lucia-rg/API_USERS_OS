@@ -1,5 +1,5 @@
-const sessionsDAO = require('../dao/sessions.dao');
-const { hashPassword } = require('../utils/auth.utils');
+import sessionsDAO from '../dao/sessions.dao.js';
+import { hashPassword } from '../utils/auth.utils.js';
 
 class SessionsService {
 
@@ -108,5 +108,5 @@ class SessionsService {
     }
 }
 
-module.exports = new SessionsService();
+export default new SessionsService();
 

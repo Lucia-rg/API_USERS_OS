@@ -1,21 +1,25 @@
-const express = require('express');
+import express from 'express';
+import passport from 'passport';
 const router = express.Router();
-const path = require('path');
 
 // Middleware de autenticación
 const requireAuth = (req, res, next) => {
-    if (req.session.user) {
+    passport.authenticate('jwt', { session: false }, (err, user) => {
+        if (err || !user) {
+            return res.redirect('/login');
+        }
+        req.user = user;
         next();
-    } else {
-        res.redirect('/login');
-    }
+    })(req, res, next);
 };
 
 const redirectIfAuth = (req, res, next) => {
-    if (req.session.user) {
-        return res.redirect('/products');
-    }
-    next();
+    passport.authenticate('jwt', { session: false }, (err, user) => {
+        if (user) {
+            return res.redirect('/products');
+        }
+        next();
+    })(req, res, next);
 };
 
 // Vistas
@@ -30,11 +34,9 @@ router.get('/register', redirectIfAuth, (req, res) => {
 
 router.get('/products', requireAuth, (req, res) => {
     res.render('products', {
-        user: req.session.user,
-        welcomeMessaje: `Bienvenido, ${req.session.user.first_name}` 
-    })
-}) 
+        user: req.user,
+        welcomeMessage: `Bienvenido, ${req.user.first_name} ${req.user.last_name}`
+    });
+});
 
-// Revisar el welcome para que cambie el bienvenido según el género
-
-module.exports = router;
+export default router;
