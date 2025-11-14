@@ -4,6 +4,25 @@
 
 Sistema de autenticación y gestión de usuarios desarrollado con Node.js, Express y MongoDB. Implementa un sistema completo de registro, login y gestión de usuarios con autenticación JWT y roles de administrador.
 
+## ⚙️ Configuración e Instalación
+
+### Variables de Entorno (.env)
+
+```env
+MONGODB_URI=MONGODB_URI=mongodb+srv://<db_username>:<db_password>@clusteros.1uxee4j.mongodb.net/?retryWrites=true&w=majority&appName=ClusterOS
+DB_NAME=API_Users_Onda_Sonar
+PORT=8080
+NODE_ENV=development
+JWT_SECRET=tu_clave_super_secreta_jwt
+JWT_EXPIRES_IN=24h
+```
+### Instalación
+**Instalar dependencias:** npm install
+
+**Ejecutar en desarrollo:** npm run dev
+
+**Ejecutar en producción:** npm start
+
 ## 🚀 Características
 
 ### 🔐 Sistema de Autenticación
@@ -104,29 +123,10 @@ Sistema de autenticación y gestión de usuarios desarrollado con Node.js, Expre
 - **dotenv** - Variables de entorno
 - **ES Modules** - Sistema de módulos moderno
 
-## ⚙️ Configuración e Instalación
-
-### Variables de Entorno (.env)
-
-```env
-MONGODB_URI=MONGODB_URI=mongodb+srv://<db_username>:<db_password>@clusteros.1uxee4j.mongodb.net/?retryWrites=true&w=majority&appName=ClusterOS
-DB_NAME=API_Users_Onda_Sonar
-PORT=8080
-NODE_ENV=development
-JWT_SECRET=tu_clave_super_secreta_jwt
-JWT_EXPIRES_IN=24h
-```
-### Instalación
-**Instalar dependencias:** npm install
-
-**Ejecutar en desarrollo:** npm run dev
-
-**Ejecutar en producción:** npm start
-
 ## 👨‍💼 Usuario de Prueba Admin
 
 **Email:** `adminCoder@coder.com`  
-**Contraseña:** Cualquier contraseña válida  
+**Contraseña:** admin123 
 **Rol:** `admin` (asignado automáticamente)
 
 ## 🔄 Flujo de Autenticación
