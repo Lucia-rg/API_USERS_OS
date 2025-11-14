@@ -13,7 +13,6 @@ import viewsRouter from './routes/views.router.js';
 import sessionsRouter from './routes/sessions.router.js';
 import passport from './config/passport.config.js';
 
-
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -129,7 +129,7 @@ JWT_EXPIRES_IN=24h
 ## 👨‍💼 Usuario de Prueba Admin
 
 **Email:** `adminCoder@coder.com`  
-**Contraseña:** admin123 
+**Contraseña:** `admin123`  
 **Rol:** `admin` (asignado automáticamente)
 
 ## 🔄 Flujo de Autenticación

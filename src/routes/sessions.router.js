@@ -32,7 +32,6 @@ const requireOwnerOrAdmin = (req, res, next) => {
 router.post('/register', sessionsController.register);
 // Login
 router.post('/login', 
-  // Middleware de autenticación
   (req, res, next) => {
     passport.authenticate('local', { session: false }, (err, user, info) => {
       if (err) return next(err);
@@ -42,16 +41,13 @@ router.post('/login',
           email: req.body.email 
         });
       }
-      req.user = user; // Asignar usuario al request
+      req.user = user;
       next();
     })(req, res, next);
   },
-  // Controller
   sessionsController.login
 );
-// router.post('/login', 
-//     passport.authenticate('local', { session: false}),
-//     sessionsController.login);
+
 // RUTAS CON JWT
 // Current
 router.get('/current', 
