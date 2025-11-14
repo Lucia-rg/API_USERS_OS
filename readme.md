@@ -6,6 +6,9 @@ Sistema de autenticación y gestión de usuarios desarrollado con Node.js, Expre
 
 ## ⚙️ Configuración e Instalación
 
+1. Copia `.env.example` a `.env`
+2. Configura tus variables de entorno
+
 ### Variables de Entorno (.env)
 
 ```env
