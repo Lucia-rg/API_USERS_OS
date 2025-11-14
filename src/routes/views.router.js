@@ -35,7 +35,7 @@ router.get('/register', redirectIfAuth, (req, res) => {
 router.get('/products', requireAuth, (req, res) => {
     res.render('products', {
         user: req.user,
-        welcomeMessage: `Bienvenido, ${req.user.first_name} ${req.user.last_name}`
+        welcomeMessage: `${req.user.first_name} ${req.user.last_name}`
     });
 });
 

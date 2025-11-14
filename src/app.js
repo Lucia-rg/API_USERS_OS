@@ -2,8 +2,10 @@ import express from 'express';
 import handlebars from 'express-handlebars';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+dotenv.config();
 
 import databaseConfig from './config/database.config.js';
 import './models/user.model.js';
@@ -24,6 +26,11 @@ app.use(cookieParser());
 
 // Configuración Handlebars
 app.engine("handlebars", handlebars.engine({
+    helpers: {
+        eq: function(a, b) {
+            return a === b;
+        }
+    },
   runtimeOptions: {
     allowProtoPropertiesByDefault: true,
     allowProtoMethodsByDefault: true

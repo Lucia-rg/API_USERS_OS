@@ -1,9 +1,11 @@
+import dotenv from 'dotenv';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import User from '../models/user.model.js';
 import { isValidPassword } from '../utils/auth.utils.js';
 import { extractToken } from '../utils/jwt.utils.js';
+dotenv.config();
 
 // Local
 
