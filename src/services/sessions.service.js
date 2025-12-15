@@ -1,20 +1,24 @@
-import sessionsDAO from '../dao/sessions.dao.js';
+import sessionsRepository from '../repositories/sessions.repository.js';
+import cartsRepository from '../repositories/carts.repository.js';
 import { hashPassword } from '../utils/auth.utils.js';
+import UserDTO from '../dto/user.dto.js';
 
 class SessionsService {
 
     async registerUser(userData) {
         try {
             const {password, ...user} = userData;
+            const newCart = await cartsRepository.create();
             const hashedPassword = hashPassword(password);
             const role = userData.email === 'adminCoder@coder.com'? 'admin' : 'user';
-            const newUser = await sessionsDAO.createUser({
+            const newUser = await sessionsRepository.create({
                 ...user,
                 password: hashedPassword,
-                role
+                role,
+                cart: newCart._id
             });
 
-            return this._UserResponse(newUser);
+            return new UserDTO(newUser);
 
         } catch (error) {
             throw new Error(`Error en servicio de registro: ${error.message}`);    
@@ -23,8 +27,8 @@ class SessionsService {
 
     async getAllUsers() {
         try {
-            const users = await sessionsDAO.findAllUsers();
-            return users.map(user => this._UserResponse(user));
+            const users = await sessionsRepository.findAll();
+            return users.map(user => new UserDTO(user));
         } catch (error) {
             throw new Error(`Error obteniendo todos los usuarios: ${error.message}`);
         }
@@ -32,11 +36,11 @@ class SessionsService {
 
     async getUserByEmail(email) {
         try {
-            const user = await sessionsDAO.findUserByEmail(email);
+            const user = await sessionsRepository.findByEmail(email);
             if (!user) {
                 throw new Error('Usuario no encontrado');
             }
-            return this._UserResponse(user);
+            return new UserDTO(user);
         } catch (error) {
             throw new Error(`Error obteniendo usuario por email: ${error.message}`);
         }
@@ -44,11 +48,11 @@ class SessionsService {
 
     async getUserById(id) {
         try {
-            const user = await sessionsDAO.findUserById(id);
+            const user = await sessionsRepository.findById(id);
             if (!user) {
                 throw new Error('Usuario no encontrado');
             }
-            return this._UserResponse(user);
+            return new UserDTO(user);
         } catch (error) {
             throw new Error(`Error obteniendo usuario por ID: ${error.message}`);
         }
@@ -59,8 +63,8 @@ class SessionsService {
             if (userData.password) {
                 userData.password = hashPassword(userData.password);
             }
-            const updatedUser = await sessionsDAO.updateUser(id, userData);
-            return this._UserResponse(updatedUser);    
+            const updatedUser = await sessionsRepository.update(id, userData);
+            return new UserDTO(updatedUser);  
         } catch (error) {
             throw new Error(`Error actualizando usuario: ${error.message}`);   
         }
@@ -68,10 +72,10 @@ class SessionsService {
 
     async deleteUser(id) {
         try {
-            const deletedUser = await sessionsDAO.deleteUser(id);
+            const deletedUser = await sessionsRepository.delete(id);
             return { 
                 message: 'Usuario eliminado correctamente',
-                user: this._UserResponse(deletedUser)
+                user: new UserDTO(deletedUser)
             };   
         } catch (error) {
             throw new Error(`Error eliminando usuario: ${error.message}`);  
@@ -80,31 +84,14 @@ class SessionsService {
 
     async deleteUserByEmail(email) {
         try {
-            const deletedUser = await sessionsDAO.deleteUserByEmail(email);
+            const deletedUser = await sessionsRepository.deleteByEmail(email);
             return { 
                 message: 'Usuario eliminado correctamente',
-                user: this._UserResponse(deletedUser)
+                user: new UserDTO(deletedUser)
             };   
         } catch (error) {
             throw new Error(`Error eliminando usuario por email: ${error.message}`);  
         }
-    }
-
-    _UserResponse(user) {
-        if (!user) return null;
-
-        return {
-            id: user._id || user.id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email: user.email,
-            age: user.age,
-            role: user.role,
-            cart: user.cart,
-            last_connection: user.last_connection,
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt
-        };
     }
 }
 

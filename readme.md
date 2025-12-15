@@ -2,7 +2,7 @@
 
 ## 📋 Descripción del Proyecto
 
-Sistema de autenticación y gestión de usuarios desarrollado con Node.js, Express y MongoDB. Implementa un sistema completo de registro, login y gestión de usuarios con autenticación JWT y roles de administrador.
+Sistema integral de **E-commerce** y gestión de usuarios desarrollado con Node.js, Express y MongoDB. Implementa un sistema completo de registro, login y gestión de usuarios, así como un flujo comercial completo con gestión de productos, carritos, control de stock y formalización de compras mediante tickets, estructurado bajo una **Arquitectura de Capas (DAO, Repository, Service, Controller)** para una alta mantenibilidad.
 
 ## ⚙️ Configuración e Instalación
 
@@ -28,8 +28,20 @@ JWT_EXPIRES_IN=24h
 
 ## 🚀 Características
 
+### 🔐 E-commerce
+- **Arquitectura de Capas:** Uso de DAO, Repository, Service, y Controller para una clara separación de responsabilidades.
+- **Gestión de Productos (CRUD):** Creación, lectura (sin paginación), actualización y eliminación.
+- **Flujo de Compra Transaccional:**
+  - **Validación de Stock:** Lógica estricta de "Todo o Nada" por cada ítem en el carrito.
+  - **Generación de Tickets:** Creación de comprobantes inmutables (Ticket) con código único.
+  - **Actualización de Stock:** Descuento de stock solo para productos comprados exitosamente.
+  - **Manejo de Fallos:** Productos sin stock suficiente permanecen en el carrito.
+- **Gestión de Carrito:**
+  - Agregar/actualizar productos en el carrito.
+  - Vaciar carrito completamente (`DELETE /api/carts/:cid`).
+
 ### 🔐 Sistema de Autenticación
-- **Registro de usuarios** con validación de datos
+- **Registro de usuarios** con validación de datos y asignación de carrito por defecto
 - **Login seguro** con Passport.js y JWT
 - **Roles de usuario**: `user` y `admin`
 - **Protección de rutas** con middleware JWT
@@ -45,7 +57,7 @@ JWT_EXPIRES_IN=24h
 - **Autenticación JWT** almacenado en cookies HTTP-only
 - **Validación de contraseñas** seguras
 - **Protección contra duplicados** de email
-- **Middleware de autorización** por roles
+- **Middleware de autorización** por roles y por propiedad de recurso (`isOwnerOrAdmin`)
 
 ## 📊 Endpoints de la API
 
@@ -53,11 +65,27 @@ JWT_EXPIRES_IN=24h
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| `POST` | `/api/sessions/register` | Registro de nuevo usuario |
+| `POST` | `/api/sessions/register` | Registro de nuevo usuario (Crea carrito por defecto) |
 | `POST` | `/api/sessions/login` | Login de usuario |
 | `GET` | `/api/sessions/logout` | Cerrar sesión |
 
 ### 🔐 Endpoints Protegidos (Requieren JWT)
+
+#### 🛍️ Gestión de Productos
+| Método | Endpoint | Descripción | Permisos |
+|--------|----------|-------------|----------|
+| `GET` | `/api/products` | Obtener listado de todos los productos| User o Admin |
+| `POST` | `/api/products` | Crear nuevo producto | Solo Admin |
+| `PUT` | `/api/products/:pid` | Actualizar producto por ID | Solo Admin |
+| `DELETE` | `/api/products/:pid` | Eliminar producto por ID | Solo Admin |
+
+#### 🛒 Gestión de Carrito y Compra
+| Método | Endpoint | Descripción | Permisos |
+|--------|----------|-------------|----------|
+| `GET` | `/api/carts/:cid` | Ver contenido del carrito | Dueño o Admin |
+| `POST` | `/api/carts/:cid/product/:pid` | Agregar/actualizar producto en el carrito | Solo User |
+| `POST` | `/api/carts/:cid/purchase` | Finalizar la compra (Genera Ticket, Stock y Actualización de Carrito) | Solo User |
+| `DELETE` | `/api/carts/:cid` | Vaciar completamente el carrito | Dueño o Admin |
 
 #### 👤 Usuario Actual
 | Método | Endpoint | Descripción | Permisos |
@@ -65,14 +93,15 @@ JWT_EXPIRES_IN=24h
 | `GET` | `/api/sessions/current` | Obtener usuario actual | Cualquier usuario autenticado |
 
 #### 👥 Gestión de Usuarios
+
 | Método | Endpoint | Descripción | Permisos |
 |--------|----------|-------------|----------|
-| `GET` | `/api/sessions/users` | Obtener todos los usuarios | Solo admin |
-| `GET` | `/api/sessions/users/id/:id` | Obtener usuario por ID | Propio usuario o admin |
-| `GET` | `/api/sessions/users/email/:email` | Obtener usuario por email | Solo admin |
-| `PUT` | `/api/sessions/users/:id` | Actualizar usuario | Propio usuario o admin |
-| `DELETE` | `/api/sessions/users/:id` | Eliminar usuario | Propio usuario o admin |
-| `DELETE` | `/api/sessions/users/email/:email` | Eliminar usuario por email | Solo    admin |
+| `GET` | `/api/users` | Obtener todos los usuarios | Solo admin |
+| `GET` | `/api/users/id/:id` | Obtener usuario por ID | Propio usuario o admin |
+| `GET` | `/api/users/email/:email` | Obtener usuario por email | Solo admin |
+| `PUT` | `/api/users/:id` | Actualizar usuario | Propio usuario o admin |
+| `DELETE` | `/api/users/:id` | Eliminar usuario | Propio usuario o admin |
+| `DELETE` | `/api/users/email/:email` | Eliminar usuario por email | Solo admin |
 
 ## 🖥️ Vistas y Funcionalidades
 
@@ -109,6 +138,7 @@ JWT_EXPIRES_IN=24h
 - **Passport.js** - Middleware de autenticación
 - **JWT** - Tokens de autenticación
 - **bcrypt** - Encriptación de contraseñas
+- **UUID** - Generación de códigos de ticket
 
 ### Frontend
 - **Handlebars** - Motor de plantillas
@@ -120,6 +150,7 @@ JWT_EXPIRES_IN=24h
 - **HTTP-only Cookies** - Almacenamiento seguro de tokens
 - **bcrypt** - Hash de contraseñas
 - **Passport Strategies** - Múltiples métodos de autenticación
+- **isOwnerOrAdmin** - Autorización de recurso
 
 ### Desarrollo
 - **Nodemon** - Reinicio automático en desarrollo
@@ -132,11 +163,12 @@ JWT_EXPIRES_IN=24h
 **Contraseña:** `admin123`  
 **Rol:** `admin` (asignado automáticamente)
 
-## 🔄 Flujo de Autenticación
+## 🔄 Flujo de Autenticación y compra
 
-1. **Registro** → Crear cuenta → Redirige a login
+1. **Registro** → Crear cuenta (genera carrito) → Redirige a login
 2. **Login** → Verificar credenciales → Generar JWT → Redirigir a productos
 3. **Acceso** → Validar JWT en cookies → Acceso a rutas protegidas
+4. **Compra** → Agregar a carrito → `/purchase` → Generar Ticket + Actualizar Stock
 4. **Logout** → Eliminar cookie JWT → Redirigir a login
 
 ---

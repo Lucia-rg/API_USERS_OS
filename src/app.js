@@ -11,6 +11,9 @@ import databaseConfig from './config/database.config.js';
 import './models/user.model.js';
 import viewsRouter from './routes/views.router.js';
 import sessionsRouter from './routes/sessions.router.js';
+import usersRouter from './routes/users.router.js';
+import productsRouter from './routes/products.router.js';
+import cartsRouter from './routes/carts.router.js';
 import passport from './config/passport.config.js';
 
 const app = express();
@@ -57,6 +60,9 @@ app.use(passport.initialize());
 // Routers
 app.use('/', viewsRouter);
 app.use('/api/sessions', sessionsRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/products', productsRouter);
+app.use('/api/carts', cartsRouter);
 
 app.get('/', (req, res) => {
     res.redirect('/login');
