@@ -1,4 +1,5 @@
 import passport from 'passport';
+import cartsRepository from '../repositories/carts.repository.js';
 
 export const authorize = (allowedRoles = []) => {
 
@@ -44,14 +45,25 @@ export const isOwnerOrAdmin = (idParamName = 'id') => {
             const resourceId = req.params[idParamName];
             const userId = user._id.toString(); 
             
-            if (user.role === 'admin' || userId === resourceId) {
-                next();
-            } else {
-                res.status(403).json({ 
-                    status: 'error', 
-                    message: 'Acceso denegado. Se requiere ser Administrador o Propietario del recurso.' 
-                });
+            if (user.role === 'admin') {
+                return next();
             }
+
+            if (idParamName === 'cid') {
+                const userCartId = user.cart.toString();
+                if (userCartId === resourceId) {
+                    return next();
+                }
+            } 
+            
+            if (userId === resourceId) {
+                return next();
+            }
+
+            res.status(403).json({ 
+                status: 'error', 
+                message: 'Acceso denegado. Permisos insuficientes para el recurso solicitado.' 
+            });
         })(req, res, next);
     };
 };

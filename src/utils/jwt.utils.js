@@ -9,7 +9,8 @@ export const generateToken = (user) => {
         id: user._id || user.id,
         email: user.email,
         first_name: user.first_name,
-        role: user.role
+        role: user.role,
+        cart: user.cart
     };
 
     const options = {
