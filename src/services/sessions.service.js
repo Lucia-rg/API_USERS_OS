@@ -1,7 +1,8 @@
 import sessionsRepository from '../repositories/sessions.repository.js';
 import cartsRepository from '../repositories/carts.repository.js';
-import { hashPassword } from '../utils/auth.utils.js';
+import { hashPassword, isValidPassword, generateSecureToken } from '../utils/auth.utils.js';
 import UserDTO from '../dto/user.dto.js';
+import emailService from './email.service.js';
 
 class SessionsService {
 
@@ -93,6 +94,59 @@ class SessionsService {
             throw new Error(`Error eliminando usuario por email: ${error.message}`);  
         }
     }
+
+    // Reseteo de contraseña
+    async requestPasswordReset(email) {
+        const user = await sessionsRepository.findByEmail(email);
+
+        if (!user) {
+            return { message: "Si la cuenta existe, recibirás un correo electrónico." };
+        }
+
+        const token = generateSecureToken();
+        const expiryTime = Date.now() + parseInt(process.env.PASSWORD_RESET_EXPIRY_MS || 3600000);
+
+        await sessionsRepository.update(user._id.toString(), {
+            resetPasswordToken: token,
+            resetPasswordExpires: new Date(expiryTime)
+        });
+
+        await emailService.sendPasswordResetEmail(user.email, token);
+
+        return { message: 'Correo de recuperación enviado con éxito.' };
+    }
+
+    async validateResetToken(token) {
+        const user = await sessionsRepository.findByResetToken(token);
+
+        if (!user || user.resetPasswordExpires < new Date()) {
+            throw new Error('El token de recuperación es inválido o ha expirado.');
+        }
+        return user;
+    }
+
+    async resetPassword(token, newPassword) {
+        const user = await this.validateResetToken(token); 
+        const isSamePassword = isValidPassword({ 
+            password: newPassword, 
+            hashedPassword: user.password 
+        });
+
+        if (isSamePassword) {
+            throw new Error('La nueva contraseña no puede ser igual a la anterior.');
+        }
+
+        const hashedPassword = hashPassword(newPassword);
+        
+        await sessionsRepository.update(user._id.toString(), {
+            password: hashedPassword,
+            resetPasswordToken: null, 
+            resetPasswordExpires: null  
+        });
+
+        return { message: 'Contraseña restablecida con éxito.' };
+    }
+
 }
 
 export default new SessionsService();

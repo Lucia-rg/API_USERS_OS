@@ -34,4 +34,10 @@ router.get('/current',
 router.get('/logout', sessionsController.logout);
 router.post('/logout', sessionsController.logout);
 
+// RUTAS REESTABLECER CONTRASEÑA
+router.post('/forgot-password', sessionsController.forgotPassword);
+// router.get('/reset-password/:token', sessionsController.getResetPasswordView);
+router.post('/reset-password/:token', sessionsController.resetPassword);
+
+
 export default router;

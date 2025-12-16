@@ -18,6 +18,10 @@ PORT=8080
 NODE_ENV=development
 JWT_SECRET=tu_clave_super_secreta_jwt
 JWT_EXPIRES_IN=24h
+EMAIL_SERVICE_USER=tu_correo_de_envio@gmail.com
+EMAIL_SERVICE_PASS=tu_contraseña_de_aplicacion_de_16_caracteres
+BASE_URL=http://localhost:8080 # URL base para enlaces de correo
+PASSWORD_RESET_EXPIRY_MS=3600000 # 1 hora (3600000 milisegundos)
 ```
 ### Instalación
 **Instalar dependencias:** npm install
@@ -46,6 +50,7 @@ JWT_EXPIRES_IN=24h
 - **Roles de usuario**: `user` y `admin`
 - **Protección de rutas** con middleware JWT
 - **Logout** con eliminación de tokens
+- **Recuperación de Contraseña:** Generación de token seguro por email y endpoint para reestablecer la clave.
 
 ### 👥 Gestión de Usuarios
 - **CRUD completo** de usuarios
@@ -68,6 +73,8 @@ JWT_EXPIRES_IN=24h
 | `POST` | `/api/sessions/register` | Registro de nuevo usuario (Crea carrito por defecto) |
 | `POST` | `/api/sessions/login` | Login de usuario |
 | `GET` | `/api/sessions/logout` | Cerrar sesión |
+| `POST` | `/api/sessions/forgot-password` | **Solicita token** de recuperación por email (envía correo). |
+| `POST` | `/api/sessions/reset-password/:token` | **Reestablece la contraseña** utilizando el token recibido. |
 
 ### 🔐 Endpoints Protegidos (Requieren JWT)
 
@@ -112,6 +119,7 @@ JWT_EXPIRES_IN=24h
 - **Validación en tiempo real** de credenciales
 - **Redirección automática** si ya está autenticado
 - **Enlace a registro** para nuevos usuarios
+- **Nota Importante:** La lógica de la API para el restablecimiento de contraseña está implementada y verificada mediante Postman, aunque las vistas front-end asociadas (resetPassword.handlebars) están actualmente comentadas en el router.
 
 #### `register.handlebars`
 - **Formulario de registro** con todos los campos requeridos
@@ -139,6 +147,7 @@ JWT_EXPIRES_IN=24h
 - **JWT** - Tokens de autenticación
 - **bcrypt** - Encriptación de contraseñas
 - **UUID** - Generación de códigos de ticket
+- **Nodemailer** - Servicio para envío de correos electrónicos (para recuperación de contraseña)
 
 ### Frontend
 - **Handlebars** - Motor de plantillas
@@ -169,7 +178,23 @@ JWT_EXPIRES_IN=24h
 2. **Login** → Verificar credenciales → Generar JWT → Redirigir a productos
 3. **Acceso** → Validar JWT en cookies → Acceso a rutas protegidas
 4. **Compra** → Agregar a carrito → `/purchase` → Generar Ticket + Actualizar Stock
-4. **Logout** → Eliminar cookie JWT → Redirigir a login
+5. **Logout** → Eliminar cookie JWT → Redirigir a login
+
+## 🔒 Flujo de Recuperación de Contraseña
+
+1. Solicitud de Token
+
+**Usuario** → `POST /api/sessions/forgot-password` (con email) → **Servidor** (Generar Token, Guardar en DB, Setear Expiración) → **Nodemailer** (Enviar email con enlace)
+
+2. Restablecimiento de Contraseña
+
+**Usuario** → `POST /api/sessions/reset-password/:token` (con `newPassword`) → **Servidor** (Validar Token, Comparar con Clave Antigua, Hashear Nueva Clave) → **Servidor** (Actualizar `password` en DB, Eliminar Token/Expiración de DB) → **API** (Mensaje de Éxito)
+
+---
+
+Esta versión es mucho más amigable para desarrolladores que revisan tu `README`.
+
+¿Te gustaría que revise algún otro punto de tu documentación o pasemos a otro tema?
 
 ---
 

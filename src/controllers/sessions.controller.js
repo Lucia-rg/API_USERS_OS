@@ -166,6 +166,42 @@ class SessionsController {
             });
         }
     }
+
+    // Reestablecer contraseña
+    async forgotPassword(req, res) {
+        const { email } = req.body;
+        try {
+            await sessionsService.requestPasswordReset(email);
+            res.status(200).json({ status: 'success', message: 'Si el correo existe, se ha enviado un enlace de recuperación.' });
+        } catch (error) {
+            console.error('ERROR CRÍTICO EN forgotPassword:', error);
+            res.status(500).json({ status: 'error', message: error.message, debug: 'Revisar consola del servidor'});
+        }
+    }
+
+    async resetPassword(req, res) {
+        const { token } = req.params;
+        const { newPassword } = req.body;
+        
+        try {
+            await sessionsService.resetPassword(token, newPassword);
+            res.status(200).json({ status: 'success', message: 'Contraseña restablecida. Puedes iniciar sesión.' });
+        } catch (error) {
+            const statusCode = error.message.includes('misma que la anterior') ? 400 : 401;
+            res.status(statusCode).json({ status: 'error', message: error.message });
+        }
+    }
+
+    // async getResetPasswordView(req, res) {
+    //     const { token } = req.params;
+    //     try {
+    //         await sessionsService.validateResetToken(token); 
+    //         res.render('resetPassword', { token, status: 'valid' }); 
+    //     } catch (error) {
+    //         res.render('resetPassword', { status: 'invalid', message: error.message });
+    //     }
+    // }
+
 }
 
 export default new SessionsController();

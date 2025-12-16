@@ -17,3 +17,7 @@ if (!databaseConfig.MONGODB_URI) {
 }
 
 export default databaseConfig;
+export const EMAIL_SERVICE_USER = process.env.EMAIL_SERVICE_USER;
+export const EMAIL_SERVICE_PASS = process.env.EMAIL_SERVICE_PASS;
+export const BASE_URL = process.env.BASE_URL;
+export const PASSWORD_RESET_EXPIRY_MS = process.env.PASSWORD_RESET_EXPIRY_MS;

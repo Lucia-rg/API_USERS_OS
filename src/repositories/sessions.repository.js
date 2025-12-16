@@ -29,6 +29,11 @@ class SessionsRepository {
     async deleteByEmail(email) {
         return await sessionsDAO.deleteUserByEmail(email);
     }
+
+    async findByResetToken(token) {
+        return await sessionsDAO.findByResetToken(token);
+    }
+
 }
 
 export default new SessionsRepository();

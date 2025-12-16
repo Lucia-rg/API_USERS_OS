@@ -102,6 +102,15 @@ class SessionsDAO {
         }
     }
 
+    async findByResetToken(token) {
+        try {
+            const user = await User.findOne({ resetPasswordToken: token }).lean();
+            return user;      
+        } catch (error) {
+            throw new Error(`Error en DAO al buscar por token: ${error.message}`);  
+        }
+    }
+
 }
 
 export default new SessionsDAO();
