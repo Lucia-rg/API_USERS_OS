@@ -192,12 +192,6 @@ PASSWORD_RESET_EXPIRY_MS=3600000 # 1 hora (3600000 milisegundos)
 
 ---
 
-Esta versión es mucho más amigable para desarrolladores que revisan tu `README`.
-
-¿Te gustaría que revise algún otro punto de tu documentación o pasemos a otro tema?
-
----
-
 **Desarrollado por:** Lucía Rodríguez Giraldo  
 **Tecnologías:** Node.js, Express, MongoDB, Passport.js, JWT, Handlebars
 
